@@ -20,7 +20,7 @@ function App() {
   }, [reference])
 
   const Search = () => {
-    axios.get(`http://api.crossref.org/works/${doi}`)
+    axios.get(`https://api.crossref.org/works/${doi}`)
     .then(function (response){
       let data = response.data.message
       console.log(data.title, data.volume, data.page, data.issue, data.author)
