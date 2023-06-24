@@ -1,12 +1,14 @@
 import axios from 'axios';
 import { useState, useEffect } from 'react';
 
+let authors = ""
 function App() {
 
   const styles = ({
 
     italic: {fontStyle: 'italic'},
 })
+  const [name, setName] = useState("")
   const [reference, setReference] = useState({'page': "", 'name': "",'year': "",'title': "",'journal': "",'issue': ""})
   const [doi, setDoi] = useState("")
   const handleChange = (e) => {
@@ -22,12 +24,25 @@ function App() {
     .then(function (response){
       let data = response.data.message
       console.log(data.title, data.volume, data.page, data.issue, data.author)
+
+      for (let i = 0; i < data.author.length; i++){
+        if (i === 0){
+          authors = data.author[i].family + ", " + data.author[i].given + "."
+        }
+        else if (i === data.author.length - 1){
+          authors = authors + ', and ' + data.author[i].family + ", " + data.author[i].given + "."
+        }
+        else{
+          authors = authors + ', ' + data.author[i].family + ", " + data.author[i].given + "."
+        }
+      }
+
   
 
         setReference(reference => ({
           ...reference,
           'page': "pp. " + data.page,
-          'name': data.author[0].family  + ", " + data.author[0].given + ".",
+          'name': authors,
           'title': data.title,
           'journal': data['short-container-title'],
           'issue': data.volume + `(${data.issue})`,
