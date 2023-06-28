@@ -1,15 +1,11 @@
 import axios from 'axios';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Component } from 'react';
+import {Form } from './Components/index.js';
 
 let authors = ""
 function App() {
 
-  const styles = ({
-
-    italic: {fontStyle: 'italic'},
-})
-  const [name, setName] = useState("")
-  const [reference, setReference] = useState({'page': "", 'name': "",'year': "",'title': "",'journal': "",'issue': ""})
+  const [reference, setReference] = useState("")
   const [doi, setDoi] = useState("")
   const handleChange = (e) => {
     e.preventDefault()
@@ -19,38 +15,25 @@ function App() {
     console.log("updated")
   }, [reference])
 
-  const Search = () => {
-    axios.get(`https://api.crossref.org/works/${doi}`)
-    .then(function (response){
-      let data = response.data.message
-      console.log(data.title, data.volume, data.page, data.issue, data.author)
+  
 
-      for (let i = 0; i < data.author.length; i++){
-        if (i === 0){
-          authors = data.author[i].family + ", " + data.author[i].given + "."
-        }
-        else if (i === data.author.length - 1){
-          authors = authors + ', and ' + data.author[i].family + ", " + data.author[i].given + "."
-        }
-        else{
-          authors = authors + ', ' + data.author[i].family + ", " + data.author[i].given + "."
-        }
+
+
+  const Search = async () => {
+    const response = await axios.get(`https://doi.org/${doi}`, {
+      headers: {
+        'Accept': 'text/x-bibliography; style=harvard-cite-them-right-no-et-al'
       }
+    });
+      console.log(response.data)
+      setReference(response.data)
+
 
   
 
-        setReference(reference => ({
-          ...reference,
-          'page': "pp. " + data.page,
-          'name': authors,
-          'title': data.title,
-          'journal': data['short-container-title'],
-          'issue': data.volume + `(${data.issue})`,
-          'year': data.created['date-parts'][0][0]
-        }))
 
-    })
-  }
+    }
+  
 
   return ( 
     <>
@@ -58,7 +41,7 @@ function App() {
 
     <button onClick={Search}> Reference! </button>
 
-    <div className='answer'> <text> {reference.name} ({reference.year}) '{reference.title}', </text> <text style={styles.italic}> {reference.journal}, </ text> <text> {reference.issue} {reference.page} </text></div>
+    <div className='answer'> <text> {reference} </text></div>
     </>
   );
 
